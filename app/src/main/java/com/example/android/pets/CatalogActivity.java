@@ -11,11 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.pets.data.PetContract;
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
 
-import static java.security.AccessController.getContext;
 
 /**
  * Displays list of pets that were entered and stored in the app.
@@ -62,17 +60,65 @@ public class CatalogActivity extends AppCompatActivity {
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+        //Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+
+        String[] projection = { PetEntry._ID,
+                                PetEntry.COLUMN_PET_NAME,
+                                PetEntry.COLUMN_PET_BREED,
+                                PetEntry.COLUMN_PET_GENDER,
+                                PetEntry.COLUMN_PET_WEIGHT };
+
+        Cursor c = db.query(PetEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+
+
+
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + cursor.getCount());
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
+            displayView.setText("The pets table contains " + c.getCount() + " pets.\n\n");
+                       displayView.append(PetEntry._ID + " - " +
+                                        PetEntry.COLUMN_PET_NAME + " - " +
+                                        PetEntry.COLUMN_PET_BREED + " - " +
+                                        PetEntry.COLUMN_PET_GENDER + " - " +
+                                        PetEntry.COLUMN_PET_WEIGHT + "\n");
+
+            // Figure out the index of each column
+                        int idColumnIndex = c.getColumnIndex(PetEntry._ID);
+                        int nameColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+                        int breedColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+                        int genderColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+                        int weightColumnIndex = c.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+
+            // Iterate through all the returned rows in the cursor
+                        while (c.moveToNext()) {
+                            int currentID = c.getInt(idColumnIndex);
+                            String currentName = c.getString(nameColumnIndex);
+                            String currentBreed = c.getString(breedColumnIndex);
+                            int currentGender = c.getInt(genderColumnIndex);
+                            int currentWeight = c.getInt(weightColumnIndex);
+
+                            // Display the values from each column of the current row in the cursor in the TextView
+                            displayView.append(("\n" + currentID + " - " +
+                                    currentName + " - " +
+                                    currentBreed + " - " +
+                                    currentGender + " - " +
+                                    currentWeight));
+                        }
+
+            } finally {
+                // Always close the cursor when you're done reading from it. This releases all its
+                // resources and makes it invalid.
+                c.close();
+            }
+
     }
 
     @Override
