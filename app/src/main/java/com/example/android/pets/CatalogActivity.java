@@ -22,6 +22,8 @@ import static java.security.AccessController.getContext;
  */
 public class CatalogActivity extends AppCompatActivity {
 
+    public static final String LOG_TAG = CatalogActivity.class.getName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +38,14 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
         displayDatabaseInfo();
     }
+
 
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
@@ -51,6 +58,7 @@ public class CatalogActivity extends AppCompatActivity {
 
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
@@ -75,13 +83,16 @@ public class CatalogActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                // Do nothing for now
+
+                displayDatabaseInfo();
+
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
